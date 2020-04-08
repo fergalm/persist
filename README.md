@@ -2,6 +2,8 @@
 
 A persistable is a python class that can be saved to a file in a portable manner, and recreated on demand. This can be useful if you wish to save the state of your code to make errors more reproducible.
 
+The current usecase for this code is to "drop" a file that enables code to be debugged if an exception is triggered in a long running code. In future, I hope to make it a medium to communicate the state of code between machines, (e.g as a re-implementation of Matlab's .fig files)
+
 ## What is a persistable?
 Making a persistable class is often as easy as
 
@@ -73,9 +75,10 @@ class Foo():
 		c =  cfg['c']		
 		stuff = cfg['extra']
 		
-		object = cls(a, b, c)
-		object.complicated_thing = ComplicatedThing(b,c)
-		object.complicated_thing.set_internal_variable(stuff)
+        obj = cls.__new__(cls)
+		obj.__dict__['complicated_thing'] = ComplicatedThing(b,c)
+		obj.complicated_thing.set_internal_variable(stuff)
+		return obj
 ```		
 		
 	
@@ -99,38 +102,38 @@ The datatime type gets persisted as an integer representing the time in millisec
 
 ## More examples
 
-```
+```python
 import persist.funcs
 
 class Foo():
-	"""Store and retrive a file with an open file handle"""
+	"""Store and retrive a file with an open file handle
+	
+	Recreating one of these objects will fail if the original file
+	is not acessible at the same path as when the original object
+	was created
+	"""
 	def __init__(self, filename):
-    		self.filename = filename
 	    	self.file_pointer = open(fp, 'r')
-	    	self.seek_pos = 0
     	
    	def to_dict(self):
    		#We can't save the filepointer, but we can save
    		#everything we need to restore the file_pointer
 		out = dict()
 		out['class'] = 'mymodule.submodule.Foo'
-		out['filename'] = self.filename
-		out['seek_pos'] = self.seek_pos
- 	        return out
+		out['filename'] = self.file_pointer.name
+		out['seek_pos'] = self.file_pointer.tell()
+        persist.validate_dict(out)
+        return out
        
     def from_dict(cls, cfg):
         _class = persist.funcs.get_class_from_instance_dict(cfg)
         assert _class == cls
-        cfg.pop('__class__')
-
-	# Create a Foo() without calling __init__
-        obj = cls.__new__(cls)
-        obj.filename = cfg['filename']
-        obj.seek_pos. = int(cfg['seekpos'])
-        obj.file_pointer = open(filename, 'r')
-        obj.file_pointer.seek(obj.seek_pos)
         
-        #Check that obj is actually persistable
-        persist.validate_dict(obj)
+        obj = cls.__new__()
+        fp = open(cfg['filename'], 'r')
+        fp.seek(int(cfg['seek_pos']))
+        obj.__dict__['file_pointer'] = fp
+        
         return obj
+
 ```
