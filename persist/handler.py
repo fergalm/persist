@@ -53,7 +53,7 @@ def handle_exceptions(func):
                 raise e
             else:
                 logger = logging.getLogger(__name__)
-                log_msg = create_log_message(func.__name__)
+                log_msg = create_log_message(func)
                 logger.error(log_msg)
 
                 persist_state(logger, func, *args, **kwargs)
