@@ -88,8 +88,10 @@ def persist_to_file(fn, **kwargs):
     """
 
     strict  = kwargs.pop('strict', True)
+    stack_level = kwargs.pop('_metadata_stack_level', 2)
+
     state = persist(kwargs, strict)
-    meta = create_metadata(2)
+    meta = create_metadata(stack_level)
 
     obj = {'state':state, 'meta':meta}
     with bz2.open(fn, "wt") as fp:
@@ -130,7 +132,7 @@ def create_metadata(n_level=1):
     meta = dict()
     meta['user'] = os.environ['USER']
     meta['date'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-    meta['version'] = VERSION
+    meta['format_version'] = VERSION
 
     #Get calling frame
     frame = inspect.currentframe()
