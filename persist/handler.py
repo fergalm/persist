@@ -56,6 +56,7 @@ def handle_exceptions(func):
                 log_msg = create_log_message(func)
                 logger.error(log_msg)
 
+                kwargs['_metadata_stack_level'] = 4
                 persist_state(logger, func, *args, **kwargs)
                 raise RuntimeError(e)
 
