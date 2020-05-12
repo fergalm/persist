@@ -4,8 +4,8 @@
 import pandas as pd
 import numpy as np
 
-import specials
-import persist
+from persist import specials
+from persist import persist
 
 def test_nonetype():
     x = None

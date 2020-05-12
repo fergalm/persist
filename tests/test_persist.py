@@ -4,7 +4,7 @@
 from pdb import set_trace as debug
 import numpy as np
 
-import persist
+from persist import persist
 import pytest
 
 #Some test objects to save
@@ -155,7 +155,7 @@ def test_class2():
 def test_meta():
     meta = persist.create_metadata()
 
-    for k in "user date version func file line".split():
+    for k in "user date format_version func file line".split():
         assert k in meta
         assert isinstance(meta[k], str)
 

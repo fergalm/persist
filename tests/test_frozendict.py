@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from frozendict import FrozenDict
+from persist.frozendict import FrozenDict
 import pytest
 
 def test_frozen():

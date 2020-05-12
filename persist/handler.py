@@ -12,6 +12,7 @@ import logging
 import persist
 import pdb
 import sys
+import os
 
 def handle_exceptions(func):
     """Wrapper to handle exceptions differently in debug/production mode.
@@ -35,12 +36,19 @@ def handle_exceptions(func):
             ...
 
 
-        foo(a, b, _debug=True)
+        foo(a, b, _debug=True, _outpath="/path/to/debug/files")
 
+
+    Note
+    ----
+    This function does introduce some confusion because wrapped functions
+    accept arguments (_debug and _outpath) that aren't part of their signatude.
+    I haven't found a clearer way to implement the desired behaviour.
     """
 
     def wrapper(*args, **kwargs):
         debug_mode = kwargs.pop('_debug', False)
+        out_path = kwargs.pop('_outpath', '.')
 
         try:
             return func(*args, **kwargs)
@@ -57,7 +65,7 @@ def handle_exceptions(func):
                 logger.error(log_msg)
 
                 kwargs['_metadata_stack_level'] = 4
-                persist_state(logger, func, *args, **kwargs)
+                persist_state(logger, out_path, func, *args, **kwargs)
                 raise RuntimeError(e)
 
     wrapper.__name__ == func.__name__
@@ -71,7 +79,7 @@ def create_log_message(func):
     return msg
 
 
-def persist_state(logger, func, *args, **kwargs):
+def persist_state(logger, out_path, func,  *args, **kwargs):
     exc_type = sys.exc_info()[0]
 
     vals = dict()
@@ -81,7 +89,7 @@ def persist_state(logger, func, *args, **kwargs):
     vals['exception'] = exc_type
     vals['backtrace'] = traceback.format_exc()
 
-    per_file = pick_persistable_filename(func)
+    per_file = pick_persistable_filename(out_path, func)
     try:
         logger.error("Persisting state to %s" %(per_file))
         persist.persist_to_file(per_file, **vals)
@@ -94,7 +102,7 @@ def persist_state(logger, func, *args, **kwargs):
             raise IOError(str(e))
 
 
-def pick_persistable_filename(func):
+def pick_persistable_filename(out_path, func):
 
     try:
         module = func.__module__
@@ -105,4 +113,4 @@ def pick_persistable_filename(func):
     funcname = func.__name__
     ts = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     fn = "%s_%s_%s.per" %(filename, funcname, ts)
-    return fn
+    return os.path.join(out_path, fn)
