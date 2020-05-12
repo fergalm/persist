@@ -1,0 +1,17 @@
+How to upload to pip
+
+1. Ensure all unit tests pass
+2. Bump version number in setup.py
+3. `python setup.py sdist`  to create new tarball
+4. Upload to pypy
+
+python setup.py sdist
+python -m twine upload -r testpypi dist/persistable-$version.tar.gz
+
+
+For pypy itself
+twine upload dist/objpersist-$version -u USERNAME -p PASSWORD
+You have to pass the password because otherwise pip insists on
+looking for it in keyring, but keyring doesn't work.
+
+Username is fergalm, firefox has the password
