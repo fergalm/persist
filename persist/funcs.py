@@ -15,7 +15,6 @@ def get_class_string(obj):
 
 def get_class_from_instance_dict(params):
     try:
-        # class_name = params.pop('__class__')
         class_name = params['__class__']
     except KeyError as e:
         raise KeyError("Keyword __class__ missing: %s" %(e))

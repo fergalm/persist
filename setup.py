@@ -9,7 +9,7 @@ setup(
     description='Save (and restore) complicated classes to (and from) a file',
     long_description='Save (and restore) complicated classes to (and from) a file. See the README for more details.',
 
-    version='0.0.5',
+    version='0.0.7',
     packages=['persist'],
     python_requires='>=3.6',
 )

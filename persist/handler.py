@@ -27,6 +27,24 @@ def handle_exceptions(func):
     Syntax errors are always thrown because they are "compile" time errors,
     not run time errors.
 
+    Additional Arguments
+    ------------
+    When a function is decorated with @handle_exceptions, it accepts
+    the following additional arguments, not included in the signatute.
+
+    _debug
+        (bool) If True, drop into the debugger when an exception is caught.
+        Default is to save the state and throw an RuntimeError
+
+    _outpath
+        (str) Where to save state files
+
+    _metadata_stack_level
+        (int) Control where in the stack to collect the machine state from.
+        The default value makes sense in most cases. Higher values allow
+        you to save the state of functions that are higher in the stack.
+        Typically you don't want to adjust this.
+
     Usage
     -----
     ::

@@ -130,7 +130,7 @@ def create_metadata(n_level=1):
     """
 
     meta = dict()
-    meta['user'] = os.environ['USER']
+    meta['user'] = os.environ.get('USER', 'unknown')
     meta['date'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     meta['format_version'] = VERSION
 
